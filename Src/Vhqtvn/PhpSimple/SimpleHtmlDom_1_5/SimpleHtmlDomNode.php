@@ -20,14 +20,14 @@ class SimpleHtmlDomNode
 {
     public $nodetype = HDOM_TYPE_TEXT;
     public $tag      = 'text';
-    public $attr     = array();
+    public $attr     = [];
     /** @var self[] */
-    public $children = array();
-    public $nodes    = array();
+    public $children = [];
+    public $nodes    = [];
     /** @var self */
     public $parent = null;
     // The "info" array - see HDOM_INFO_... for what each element contains.
-    public  $_         = array();
+    public  $_         = [];
     public  $tag_start = 0;
     private $dom       = null;
 
@@ -146,22 +146,39 @@ class SimpleHtmlDomNode
     }
 
     // verify that node has children
+
+    /**
+     * @return bool
+     */
     function has_child()
     {
         return !empty($this->children);
     }
 
-    // returns children of node
-    function children($idx = -1)
+    /**
+     * @return SimpleHtmlDomNode[]
+     */
+    function children()
     {
-        if ($idx === -1) {
-            return $this->children;
-        }
+        return $this->children;
+    }
+
+    /**
+     * @param $idx
+     *
+     * @return null|SimpleHtmlDomNode
+     */
+    function child($idx)
+    {
         if (isset($this->children[$idx])) return $this->children[$idx];
         return null;
     }
 
-    // returns the first child of node
+    /**
+     * returns the first child of node
+     *
+     * @return null|SimpleHtmlDomNode
+     */
     function first_child()
     {
         if (count($this->children) > 0) {
@@ -170,7 +187,11 @@ class SimpleHtmlDomNode
         return null;
     }
 
-    // returns the last child of node
+    /**
+     * returns the last child of node
+     *
+     * @return null|SimpleHtmlDomNode
+     */
     function last_child()
     {
         if (($count = count($this->children)) > 0) {
@@ -179,7 +200,12 @@ class SimpleHtmlDomNode
         return null;
     }
 
-    // returns the next sibling of node
+
+    /**
+     * returns the next sibling of node
+     *
+     * @return null|SimpleHtmlDomNode
+     */
     function next_sibling()
     {
         if ($this->parent === null) {
@@ -197,7 +223,12 @@ class SimpleHtmlDomNode
         return $this->parent->children[$idx];
     }
 
-    // returns the previous sibling of node
+
+    /**
+     * returns the previous sibling of node
+     *
+     * @return null|SimpleHtmlDomNode
+     */
     function prev_sibling()
     {
         if ($this->parent === null) return null;
@@ -209,7 +240,13 @@ class SimpleHtmlDomNode
         return $this->parent->children[$idx];
     }
 
-    // function to locate a specific ancestor tag in the path to the root.
+    /**
+     * function to locate a specific ancestor tag in the path to the root.
+     *
+     * @param string $tag
+     *
+     * @return SimpleHtmlDomNode|null
+     */
     function find_ancestor_tag($tag)
     {
         // Start by including ourselves in the comparison.
@@ -224,7 +261,11 @@ class SimpleHtmlDomNode
         return $returnDom;
     }
 
-    // get dom node's inner html
+    /**
+     * get dom node's inner html
+     *
+     * @return string
+     */
     function innertext()
     {
         if (isset($this->_[HDOM_INFO_INNER])) return $this->_[HDOM_INFO_INNER];
@@ -236,14 +277,18 @@ class SimpleHtmlDomNode
         return $ret;
     }
 
-    // get dom node's outer text (with tag)
+    /**
+     * get dom node's outer text (with tag)
+     *
+     * @return string
+     */
     function outertext()
     {
         if ($this->tag === 'root') return $this->innertext();
 
         // trigger callback
         if ($this->dom && $this->dom->callback !== null) {
-            call_user_func_array($this->dom->callback, array($this));
+            call_user_func_array($this->dom->callback, [$this]);
         }
 
         if (isset($this->_[HDOM_INFO_OUTER])) return $this->_[HDOM_INFO_OUTER];
@@ -276,7 +321,11 @@ class SimpleHtmlDomNode
         return $ret;
     }
 
-    // get dom node's plain text
+    /**
+     * get dom node's plain text
+     *
+     * @return mixed|string
+     */
     function text()
     {
         if (isset($this->_[HDOM_INFO_INNER])) return $this->_[HDOM_INFO_INNER];
@@ -310,6 +359,9 @@ class SimpleHtmlDomNode
         return $ret;
     }
 
+    /**
+     * @return string
+     */
     function xmltext()
     {
         $ret = $this->innertext();
@@ -368,21 +420,21 @@ class SimpleHtmlDomNode
     function find($selector, $lowercase = false)
     {
         $selectors = $this->parse_selector($selector);
-        if (($count = count($selectors)) === 0) return array();
-        $found_keys = array();
+        if (($count = count($selectors)) === 0) return [];
+        $found_keys = [];
 
         // find each selector
         for ($c = 0; $c < $count; ++$c) {
             // The change on the below line was documented on the sourceforge code tracker id 2788009
             // used to be: if (($level=count($selectors[0]))===0) return array();
-            if (($level = count($selectors[$c])) === 0) return array();
-            if (!isset($this->_[HDOM_INFO_BEGIN])) return array();
+            if (($level = count($selectors[$c])) === 0) return [];
+            if (!isset($this->_[HDOM_INFO_BEGIN])) return [];
 
-            $head = array($this->_[HDOM_INFO_BEGIN] => 1);
+            $head = [$this->_[HDOM_INFO_BEGIN] => 1];
 
             // handle descendant selectors, no recursive!
             for ($l = 0; $l < $level; ++$l) {
-                $ret = array();
+                $ret = [];
                 foreach ($head as $k => $v) {
                     $n = ($k === -1) ? $this->dom->root : $this->dom->nodes[$k];
                     //PaperG - Pass this optional parameter on to the seek function.
@@ -400,7 +452,7 @@ class SimpleHtmlDomNode
         // sort keys
         ksort($found_keys);
 
-        $found = array();
+        $found = [];
         foreach ($found_keys as $k => $v)
             $found[] = $this->dom->nodes[$k];
 
@@ -551,15 +603,15 @@ class SimpleHtmlDomNode
         $pattern = "/([\w-:\*]*)(?:\#([\w-]+)|\.([\w-]+))?(?:\[@?(!?[\w-:]+)(?:([!*^$]?=)[\"']?(.*?)[\"']?)?\])?([\/, ]+)/is";
         preg_match_all($pattern, trim($selector_string) . ' ', $matches, PREG_SET_ORDER);
 
-        $selectors = array();
-        $result    = array();
+        $selectors = [];
+        $result    = [];
         //print_r($matches);
 
         foreach ($matches as $m) {
             $m[0] = trim($m[0]);
             if ($m[0] === '' || $m[0] === '/' || $m[0] === '//') continue;
 
-            list($tag, $key, $val, $exp, $no_key) = array($m[1], null, null, '=', false);
+            list($tag, $key, $val, $exp, $no_key) = [$m[1], null, null, '=', false];
             if (!empty($m[2])) {
                 $key = 'id';
                 $val = trim($m[2]);
@@ -589,10 +641,10 @@ class SimpleHtmlDomNode
                 $no_key = true;
             }
 
-            $result[] = array($tag, $key, $val, $exp, $no_key);
+            $result[] = [$tag, $key, $val, $exp, $no_key];
             if (trim($m[7]) === ',') {
                 $selectors[] = $result;
-                $result      = array();
+                $result      = [];
             }
         }
         if (count($result) > 0)
@@ -629,7 +681,7 @@ class SimpleHtmlDomNode
                 return $this->_[HDOM_INFO_INNER] = $value;
         }
         if (!isset($this->attr[$name])) {
-            $this->_[HDOM_INFO_SPACE][] = array(' ', '', '');
+            $this->_[HDOM_INFO_SPACE][] = [' ', '', ''];
             $this->_[HDOM_INFO_QUOTE][] = HDOM_QUOTE_DOUBLE;
         }
         return $this->attr[$name] = $value;
@@ -751,7 +803,7 @@ class SimpleHtmlDomNode
         // Now look for an inline style.
         if (isset($this->attr['style'])) {
             // Thanks to user gnarf from stackoverflow for this regular expression.
-            $attributes = array();
+            $attributes = [];
             preg_match_all("/([\w-]+)\s*:\s*([^;]+)\s*;?/", $this->attr['style'], $matches, PREG_SET_ORDER);
             foreach ($matches as $match) {
                 $attributes[$match[1]] = $match[2];
@@ -793,8 +845,8 @@ class SimpleHtmlDomNode
         // ridiculously far future development
         // If the class or id is specified in a SEPARATE css file thats not on the page, go get it and do what we were just doing for the ones on the page.
 
-        $result = array('height' => $height,
-                        'width'  => $width);
+        $result = ['height' => $height,
+                   'width'  => $width];
         return $result;
     }
 
@@ -824,66 +876,127 @@ class SimpleHtmlDomNode
         $this->__set($name, null);
     }
 
-    function getElementById($id)
+    /**
+     * @param     $id
+     * @param int $idx
+     *
+     * @return null|SimpleHtmlDomNode
+     */
+    function getElementById($id, $idx = 0)
     {
-        return $this->find_nth("#$id", 0);
+        return $this->find_nth("#$id", $idx);
     }
 
-    function getElementsById($id, $idx = null)
+    /**
+     * @param      $id
+     *
+     * @return SimpleHtmlDomNode[]
+     */
+    function getElementsById($id)
     {
-        return $this->find("#$id", $idx);
+        return $this->find("#$id");
     }
 
-    function getElementByTagName($name)
+    /**
+     * @param     $name
+     * @param int $idx
+     *
+     * @return null|SimpleHtmlDomNode
+     */
+    function getElementByTagName($name, $idx = 0)
     {
-        return $this->find($name, 0);
+        return $this->find_nth($name, $idx);
     }
 
-    function getElementsByTagName($name, $idx = null)
+    /**
+     * @param $name
+     *
+     * @return SimpleHtmlDomNode[]
+     */
+    function getElementsByTagName($name)
     {
-        return $this->find($name, $idx);
+        return $this->find($name);
     }
 
+    /**
+     * @return null|SimpleHtmlDomNode
+     */
     function parentNode()
     {
         return $this->parent();
     }
 
-    function childNodes($idx = -1)
+    /**
+     * @return SimpleHtmlDomNode[]
+     */
+    function childNodes()
     {
-        return $this->children($idx);
+        return $this->children();
     }
 
+    /**
+     * @param $idx
+     *
+     * @return null|SimpleHtmlDomNode
+     */
+    function childNode($idx)
+    {
+        return $this->child($idx);
+    }
+
+    /**
+     * @return null|SimpleHtmlDomNode
+     */
     function firstChild()
     {
         return $this->first_child();
     }
 
+    /**
+     * @return null|SimpleHtmlDomNode
+     */
     function lastChild()
     {
         return $this->last_child();
     }
 
+    /**
+     * @return null|SimpleHtmlDomNode
+     */
     function nextSibling()
     {
         return $this->next_sibling();
     }
 
+    /**
+     * @return null|SimpleHtmlDomNode
+     */
     function previousSibling()
     {
         return $this->prev_sibling();
     }
 
+    /**
+     * @return bool
+     */
     function hasChildNodes()
     {
         return $this->has_child();
     }
 
+    /**
+     * @return string
+     */
     function nodeName()
     {
         return $this->tag;
     }
 
+    /**
+     * @param SimpleHtmlDomNode $node
+     *
+     * @return SimpleHtmlDomNode
+     */
     function appendChild(SimpleHtmlDomNode $node)
     {
         $node->parent($this);

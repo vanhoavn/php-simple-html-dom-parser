@@ -29,9 +29,9 @@ class SimpleHtmlDom
     /** @var SimpleHtmlDomNode $root */
     public $root = null;
     /** @var SimpleHtmlDomNode[] */
-    public $nodes = array();
+    public $nodes = [];
     /** @var SimpleHtmlDomNode[] */
-    public $children  = array();
+    public $children  = [];
     public $callback  = null;
     public $lowercase = false;
     // Used to keep track of how large the text was when we started.
@@ -43,7 +43,7 @@ class SimpleHtmlDom
     protected $cursor;
     /** @var SimpleHtmlDomNode */
     protected $parent;
-    protected $noise       = array();
+    protected $noise       = [];
     protected $token_blank = " \t\r\n";
     protected $token_equal = ' =/>';
     protected $token_slash = " />\r\n\t";
@@ -55,23 +55,23 @@ class SimpleHtmlDom
     public    $default_span_text = "";
 
     // use isset instead of in_array, performance boost about 30%...
-    protected $self_closing_tags = array('img' => 1, 'br' => 1, 'input' => 1, 'meta' => 1, 'link' => 1, 'hr' => 1, 'base' => 1, 'embed' => 1, 'spacer' => 1);
-    protected $block_tags        = array('root' => 1, 'body' => 1, 'form' => 1, 'div' => 1, 'span' => 1, 'table' => 1);
+    protected $self_closing_tags = ['img' => 1, 'br' => 1, 'input' => 1, 'meta' => 1, 'link' => 1, 'hr' => 1, 'base' => 1, 'embed' => 1, 'spacer' => 1];
+    protected $block_tags        = ['root' => 1, 'body' => 1, 'form' => 1, 'div' => 1, 'span' => 1, 'table' => 1];
     // Known sourceforge issue #2977341
     // B tags that are not closed cause us to return everything to the end of the document.
-    protected $optional_closing_tags = array(
-        'tr'     => array('tr' => 1, 'td' => 1, 'th' => 1),
-        'th'     => array('th' => 1),
-        'td'     => array('td' => 1),
-        'li'     => array('li' => 1),
-        'dt'     => array('dt' => 1, 'dd' => 1),
-        'dd'     => array('dd' => 1, 'dt' => 1),
-        'dl'     => array('dd' => 1, 'dt' => 1),
-        'p'      => array('p' => 1),
-        'nobr'   => array('nobr' => 1),
-        'b'      => array('b' => 1),
-        'option' => array('option' => 1),
-    );
+    protected $optional_closing_tags = [
+        'tr'     => ['tr' => 1, 'td' => 1, 'th' => 1],
+        'th'     => ['th' => 1],
+        'td'     => ['td' => 1],
+        'li'     => ['li' => 1],
+        'dt'     => ['dt' => 1, 'dd' => 1],
+        'dd'     => ['dd' => 1, 'dt' => 1],
+        'dl'     => ['dd' => 1, 'dt' => 1],
+        'p'      => ['p' => 1],
+        'nobr'   => ['nobr' => 1],
+        'b'      => ['b' => 1],
+        'option' => ['option' => 1],
+    ];
 
     function __construct($str = null, $lowercase = true, $forceTagsClosed = true, $target_charset = DEFAULT_TARGET_CHARSET, $stripRN = true, $defaultBRText = DEFAULT_BR_TEXT, $defaultSpanText = DEFAULT_SPAN_TEXT)
     {
@@ -158,13 +158,30 @@ class SimpleHtmlDom
         return $ret;
     }
 
-    // find dom node by css selector
-    // Paperg - allow us to specify that we want case insensitive testing of the value of the selector.
+    /**
+     * find elements by css selector
+     * PaperG - added ability for find to lowercase the value of the selector.
+     *
+     * @param string $selector
+     * @param bool   $lowercase
+     *
+     * @return SimpleHtmlDomNode[]
+     */
     function find($selector, $lowercase = false)
     {
         return $this->root->find($selector, $lowercase);
     }
 
+    /**
+     * find elements by css selector
+     * PaperG - added ability for find to lowercase the value of the selector.
+     *
+     * @param string $selector
+     * @param int    $idx
+     * @param bool   $lowercase
+     *
+     * @return SimpleHtmlDomNode|null
+     */
     function find_nth($selector, $idx = null, $lowercase = false)
     {
         return $this->root->find_nth($selector, $idx, $lowercase);
@@ -222,8 +239,8 @@ class SimpleHtmlDom
         $this->doc                      = $str;
         $this->pos                      = 0;
         $this->cursor                   = 1;
-        $this->noise                    = array();
-        $this->nodes                    = array();
+        $this->noise                    = [];
+        $this->nodes                    = [];
         $this->lowercase                = $lowercase;
         $this->default_br_text          = $defaultBRText;
         $this->default_span_text        = $defaultSpanText;
@@ -285,7 +302,7 @@ class SimpleHtmlDom
         // If we couldn't find a charset above, then lets try to detect one based on the text we got...
         if (empty($charset)) {
             // Have php try to detect the encoding from the text given to us.
-            $charset = mb_detect_encoding($this->root->plaintext . "ascii", $encoding_list = array("UTF-8", "CP1252"));
+            $charset = mb_detect_encoding($this->root->plaintext . "ascii", $encoding_list = ["UTF-8", "CP1252"]);
 
             // and if this doesn't work...  then we need to just wrongheadedly assume it's UTF-8 so that we can move on - cause this will usually give us most of what we need...
             if ($charset === false) {
@@ -426,7 +443,7 @@ class SimpleHtmlDom
         }
 
         $guard = 0; // prevent infinity loop
-        $space = array($this->copy_skip($this->token_blank), '', '');
+        $space = [$this->copy_skip($this->token_blank), '', ''];
 
         // attributes
         do {
@@ -454,7 +471,7 @@ class SimpleHtmlDom
             if ($this->doc[$this->pos - 1] == '<') {
                 $node->nodetype          = HDOM_TYPE_TEXT;
                 $node->tag               = 'text';
-                $node->attr              = array();
+                $node->attr              = [];
                 $node->_[HDOM_INFO_END]  = 0;
                 $node->_[HDOM_INFO_TEXT] = substr($this->doc, $begin_tag_pos, $this->pos - $begin_tag_pos - 1);
                 $this->pos               -= 2;
@@ -477,7 +494,7 @@ class SimpleHtmlDom
                     if ($this->char != '>') $this->char = $this->doc[--$this->pos]; // prev
                 }
                 $node->_[HDOM_INFO_SPACE][] = $space;
-                $space                      = array($this->copy_skip($this->token_blank), '', '');
+                $space                      = [$this->copy_skip($this->token_blank), '', ''];
             } else
                 break;
         } while ($this->char !== '>' && $this->char !== '/');
@@ -716,46 +733,99 @@ class SimpleHtmlDom
     }
 
     // camel naming conventions
-    function childNodes($idx = -1)
+
+    /**
+     * @return SimpleHtmlDomNode[]
+     */
+    function childNodes()
     {
-        return $this->root->childNodes($idx);
+        return $this->root->childNodes();
     }
 
+    /**
+     * @param $idx
+     *
+     * @return null|SimpleHtmlDomNode
+     */
+    function childNode($idx)
+    {
+        return $this->root->childNode($idx);
+    }
+
+    /**
+     * @return null|SimpleHtmlDomNode
+     */
     function firstChild()
     {
         return $this->root->first_child();
     }
 
+    /**
+     * @return null|SimpleHtmlDomNode
+     */
     function lastChild()
     {
         return $this->root->last_child();
     }
 
+    /**
+     * @param      $name
+     * @param null $value
+     *
+     * @return null|SimpleHtmlDomNode
+     */
     function createElement($name, $value = null)
     {
         return @HtmlDomParser::str_get_html("<$name>$value</$name>")->firstChild();
     }
 
+    /**
+     * @param $value
+     *
+     * @return mixed|SimpleHtmlDomNode
+     */
     function createTextNode($value)
     {
         return @end(HtmlDomParser::str_get_html($value)->nodes);
     }
 
-    function getElementById($id)
+    /**
+     * @param $id
+     * @param $index
+     *
+     * @return null|SimpleHtmlDomNode
+     */
+    function getElementById($id, $index)
     {
-        return $this->find_nth("#$id", 0);
+        return $this->find_nth("#$id", $index);
     }
 
-    function getElementsById($id, $idx = null)
+    /**
+     * @param $id
+     *
+     * @return SimpleHtmlDomNode[]
+     */
+    function getElementsById($id)
     {
-        return $this->find("#$id", $idx);
+        return $this->find("#$id");
     }
 
-    function getElementByTagName($name)
+    /**
+     * @param $name
+     * @param $index
+     *
+     * @return null|SimpleHtmlDomNode
+     */
+    function getElementByTagName($name, $index)
     {
-        return $this->find_nth($name, 0);
+        return $this->find_nth($name, $index);
     }
 
+    /**
+     * @param $name
+     *
+     * @return SimpleHtmlDomNode[]
+     */
     function getElementsByTagName($name)
     {
         return $this->find($name);
