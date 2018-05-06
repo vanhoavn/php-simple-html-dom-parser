@@ -7,7 +7,7 @@ Usage
 -----
 
 ```
-composer require vhqtvn/php-simple-html-dom-parser
+composer require vanhoavn/php-simple-html-dom-parser
 ```
 
 ```php
