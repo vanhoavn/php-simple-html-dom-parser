@@ -39,7 +39,6 @@ namespace Vhqtvn\PhpSimple;
  * @author     Rus Carroll
  * @version    1.5 ($Rev: 196 $)
  * @package    PlaceLocalInclude
- * @subpackage simple_html_dom
  */
 
 /**
@@ -71,7 +70,6 @@ if (!defined('HDOM_MAX_FILE_SIZE')) {
     define('HDOM_MAX_FILE_SIZE', 50000000);
 }
 
-use Vhqtvn\PhpSimple\SimpleHtmlDom_1_5\simple_html_dom;
 use Vhqtvn\PhpSimple\SimpleHtmlDom_1_5\SimpleHtmlDom;
 
 

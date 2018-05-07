@@ -1,30 +1,36 @@
 {
-    "name": "vanhoavn/php-simple-html-dom-parser",
-    "type": "library",
-    "description": "Composer adaptation of: A HTML DOM parser written in PHP5+ let you manipulate HTML in a very easy way! Require PHP 5+. Supports invalid HTML. Find tags on an HTML page with selectors just like jQuery. Extract contents from HTML in a single line.",    
-    "keywords": ["html", "dom", "parser"],
-    "homepage": "https://github.com/vanhoavn/php-simple-html-dom-parser",
-    "license": "MIT",
-    "authors": [
-        {            
-            "homepage": "http://sourceforge.net/projects/simplehtmldom/"
-        },
-        {
-            "name": "Vhqtvn",
-            "email": "vanhoa@vhn.vn",
-            "homepage": "https://github.com/vhqtvn"
-        },
-        {
-            "name": "Sunra",
-            "email": "sunra@yandex.ru",
-            "homepage": "https://github.com/sunra"
-        }
-    ],
-    "require": {
-        "php": ">=5.6",
-        "ext-mbstring": "*"
+  "name": "vanhoavn/php-simple-html-dom-parser",
+  "type": "library",
+  "description": "Composer adaptation of: A HTML DOM parser written in PHP5+ let you manipulate HTML in a very easy way! Require PHP 5+. Supports invalid HTML. Find tags on an HTML page with selectors just like jQuery. Extract contents from HTML in a single line.",
+  "keywords": [
+    "html",
+    "dom",
+    "parser"
+  ],
+  "homepage": "https://github.com/vanhoavn/php-simple-html-dom-parser",
+  "license": "MIT",
+  "authors": [
+    {
+      "homepage": "http://sourceforge.net/projects/simplehtmldom/"
     },
-    "autoload": {
-        "psr-0": { "Vhqtvn\\PhpSimple\\HtmlDomParser": "Src/" }
-    }    
+    {
+      "name": "Vhqtvn",
+      "email": "vanhoa@vhn.vn",
+      "homepage": "https://github.com/vhqtvn"
+    },
+    {
+      "name": "Sunra",
+      "email": "sunra@yandex.ru",
+      "homepage": "https://github.com/sunra"
+    }
+  ],
+  "require": {
+    "php": ">=5.6",
+    "ext-mbstring": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Vhqtvn\\PhpSimple\\": "Src/Vhqtvn/PhpSimple/"
+    }
+  }
 }
