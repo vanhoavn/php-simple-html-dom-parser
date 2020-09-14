@@ -415,7 +415,7 @@ class SimpleHtmlDom
             return true;
         }
 
-        if (!preg_match("/^[\w-:]+$/", $tag)) {
+        if (!preg_match("/^[-a-zA-Z0-9:]+$/", $tag)) {
             $node->_[HDOM_INFO_TEXT] = '<' . $tag . $this->copy_until('<>');
             if ($this->char === '<') {
                 $this->link_nodes($node, false);
